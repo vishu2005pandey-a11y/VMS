@@ -5,9 +5,30 @@
     "highwayName": "Tecsidel Intelligent Transportation Systems (ITS)",
     "operator": "Tecsidel Toll Automation & ATMS Division",
     "healthCheckIntervalSec": 20,
-    "enableVirtualEcho": false
+    "enableVirtualEcho": true
   },
   "devices": [
+    {
+      "id": "tecsidel-live-01",
+      "name": "Tecsidel Interactive Sign (Live Gateway)",
+      "type": "GANTRY",
+      "laneNumber": null,
+      "ip": "127.0.0.1",
+      "port": 5005,
+      "protocol": "NHAI_ASCII",
+      "address": "01",
+      "matrixWidth": 192,
+      "matrixHeight": 32,
+      "status": "connected",
+      "lastSeen": null,
+      "currentMessage": {
+        "line1": "TECSIDEL TOLL SYSTEMS",
+        "line2": "FASTag LANE OPEN - ₹85",
+        "color": "G",
+        "effect": "S",
+        "speed": "05"
+      }
+    },
     {
       "id": "canopy-01",
       "name": "Overhead Canopy Gantry VMS",

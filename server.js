@@ -6,6 +6,7 @@ const path = require('path');
 const configManager = require('./config/configManager');
 const protocols = require('./protocols');
 const { probeSocket, scanSubnet } = require('./tools/ipScanner');
+const CloudSyncEngine = require('./tools/cloudSyncEngine');
 
 const app = express();
 const server = http.createServer(app);
@@ -181,6 +182,65 @@ app.post('/api/scan-network', async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+// =========================================================================
+// CENTRAL CLOUD TELEMETRY & SYNC API (HQ LEVEL)
+// =========================================================================
+
+// In-memory registry of reporting plazas (for Central HQ server mode)
+const reportingPlazas = new Map();
+
+// Endpoint for Local Toll Plazas to push live telemetry up to Central HQ
+app.post('/api/central/sync', (req, res) => {
+  const data = req.body;
+  if (!data.plazaCode) {
+    return res.status(400).json({ error: 'plazaCode is required' });
+  }
+
+  data.lastReceivedAt = new Date().toISOString();
+  reportingPlazas.set(data.plazaCode, data);
+
+  // Broadcast to all connected HQ operators watching dashboard
+  broadcastWs({
+    type: 'CENTRAL_PLAZA_SYNCED',
+    plazaCode: data.plazaCode,
+    plazaName: data.plazaName,
+    data
+  });
+
+  res.json({ success: true, acknowledgedAt: new Date().toISOString() });
+});
+
+// Endpoint for Central HQ dashboard to list all synchronized toll plazas
+app.get('/api/central/plazas', (req, res) => {
+  res.json({
+    success: true,
+    count: reportingPlazas.size,
+    plazas: Array.from(reportingPlazas.values())
+  });
+});
+
+// Local Plaza Cloud Sync Client instance
+const cloudSync = new CloudSyncEngine({
+  centralUrl: process.env.CENTRAL_CLOUD_URL || '',
+  plazaCode: configManager.getPlazaInfo().plazaCode,
+  syncIntervalSec: 10
+});
+
+cloudSync.start(() => ({
+  plazaInfo: configManager.getPlazaInfo(),
+  devices: configManager.getDevices()
+}));
+
+app.get('/api/sync-status', (req, res) => {
+  res.json({ success: true, status: cloudSync.getStatus() });
+});
+
+app.post('/api/configure-sync', (req, res) => {
+  const { centralUrl } = req.body;
+  cloudSync.setCentralUrl(centralUrl);
+  res.json({ success: true, status: cloudSync.getStatus() });
 });
 
 // Send Message to VMS Display(s)

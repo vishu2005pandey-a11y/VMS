@@ -10,8 +10,8 @@ class TollVMSApp {
     this.packetMonitor = null;
     this.ledCanvas = null;
     this.plazaInfo = {
-      plazaName: "NHAI Toll Plaza - Operations Center",
-      plazaCode: "NHAI-PLAZA-01"
+      plazaName: "Tecsidel Toll Operations Center",
+      plazaCode: "TECSIDEL-TCS"
     };
 
     // Web Serial API port handle if user connects directly via USB-RS485

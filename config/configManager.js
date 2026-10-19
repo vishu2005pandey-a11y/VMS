@@ -5,10 +5,10 @@ const CONFIG_PATH = path.join(__dirname, 'plaza_config.json');
 
 const DEFAULT_CONFIG = {
   plazaInfo: {
-    plazaName: "NHAI Toll Plaza - Operations Center",
-    plazaCode: "NHAI-PLAZA-01",
-    highwayName: "National Highway Highway Corridor",
-    operator: "Toll Operations & ATMS",
+    plazaName: "Tecsidel Toll Operations Center",
+    plazaCode: "TECSIDEL-NHAI-01",
+    highwayName: "Tecsidel Intelligent Transportation Systems (ITS)",
+    operator: "Tecsidel Toll Automation & ATMS Division",
     healthCheckIntervalSec: 20,
     enableVirtualEcho: false // Disabled by default for real production
   },

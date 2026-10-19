@@ -1,5 +1,5 @@
-# 🚦 Toll Plaza Variable Message Sign (VMS) & UFD Operations Center
-### NHAI / IHMCL Highway ATMS Central Signage & Hardware Controller
+# 🚦 Tecsidel Toll Plaza Variable Message Sign (VMS) & UFD Operations Center
+### Tecsidel Toll Collection Systems (TCS) & NHAI Highway ATMS Central Signage Controller
 
 ---
 

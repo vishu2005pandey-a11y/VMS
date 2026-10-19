@@ -1,0 +1,142 @@
+{
+  "plazaInfo": {
+    "plazaName": "NHAI Toll Plaza - Operations Center",
+    "plazaCode": "NHAI-PLAZA-01",
+    "highwayName": "National Highway Highway Corridor",
+    "operator": "Toll Operations & ATMS",
+    "healthCheckIntervalSec": 20,
+    "enableVirtualEcho": false
+  },
+  "devices": [
+    {
+      "id": "canopy-01",
+      "name": "Overhead Canopy Gantry VMS",
+      "type": "GANTRY",
+      "laneNumber": null,
+      "ip": "192.168.1.100",
+      "port": 5005,
+      "protocol": "NHAI_ASCII",
+      "address": "01",
+      "matrixWidth": 192,
+      "matrixHeight": 32,
+      "status": "offline",
+      "lastSeen": null,
+      "currentMessage": {
+        "line1": "FASTag LANE ONLY",
+        "line2": "कृपया लेन न बदलें",
+        "color": "A",
+        "effect": "S",
+        "speed": "05"
+      }
+    },
+    {
+      "id": "approach-01",
+      "name": "Highway Approach 1KM VMS",
+      "type": "APPROACH",
+      "laneNumber": null,
+      "ip": "192.168.1.101",
+      "port": 5005,
+      "protocol": "NTCIP_1203",
+      "address": "02",
+      "matrixWidth": 160,
+      "matrixHeight": 32,
+      "status": "offline",
+      "lastSeen": null,
+      "currentMessage": {
+        "line1": "TOLL PLAZA 1 KM AHEAD",
+        "line2": "SPEED LIMIT 30 KM/H",
+        "color": "A",
+        "effect": "S",
+        "speed": "05"
+      }
+    },
+    {
+      "id": "lane-01",
+      "name": "ttttttt",
+      "type": "APPROACH",
+      "laneNumber": 1,
+      "ip": "192.168.1.111",
+      "port": 5005,
+      "protocol": "NHAI_ASCII",
+      "address": "11",
+      "matrixWidth": 96,
+      "matrixHeight": 32,
+      "laneSignal": "G",
+      "status": "offline",
+      "lastSeen": null,
+      "currentMessage": {
+        "line1": "",
+        "line2": "",
+        "line3": "",
+        "color": "A",
+        "effect": "S",
+        "speed": "05"
+      }
+    },
+    {
+      "id": "lane-02",
+      "name": "okh",
+      "type": "LANE_UFD",
+      "laneNumber": 2,
+      "ip": "192.168.1.112",
+      "port": 5005,
+      "protocol": "NHAI_ASCII",
+      "address": "12",
+      "matrixWidth": 96,
+      "matrixHeight": 32,
+      "laneSignal": "G",
+      "status": "standby",
+      "lastSeen": null,
+      "currentMessage": {
+        "line1": "FASTag VALID",
+        "line2": "PROCEED TO LANE",
+        "color": "G",
+        "effect": "S",
+        "speed": "05"
+      }
+    },
+    {
+      "id": "lane-03",
+      "name": "Lane 03 - Cash / ETC Hybrid & LCS",
+      "type": "LANE_UFD",
+      "laneNumber": 3,
+      "ip": "192.168.1.113",
+      "protocol": "NHAI_ASCII",
+      "address": "13",
+      "matrixWidth": 96,
+      "matrixHeight": 32,
+      "laneSignal": "G",
+      "status": "standby",
+      "lastSeen": null,
+      "currentMessage": {
+        "line1": "CASH & FASTAG",
+        "line2": "STOP - PAY TOLL",
+        "color": "A",
+        "effect": "S",
+        "speed": "05"
+      }
+    },
+    {
+      "id": "lane-04",
+      "name": "Lane 04 - FASTag UFD & LCS",
+      "type": "LANE_UFD",
+      "laneNumber": 4,
+      "ip": "192.168.1.114",
+      "port": 5005,
+      "protocol": "NHAI_ASCII",
+      "address": "14",
+      "matrixWidth": 96,
+      "matrixHeight": 32,
+      "laneSignal": "G",
+      "status": "offline",
+      "lastSeen": null,
+      "currentMessage": {
+        "line1": "FASTag VALID",
+        "line2": "PROCEED TO LANE",
+        "color": "G",
+        "effect": "S",
+        "speed": "05"
+      }
+    }
+  ]
+}

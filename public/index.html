@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toll Plaza VMS Controller - Highway ATMS & Signage</title>
+  <meta name="description" content="Industrial Variable Message Sign (VMS) & User Fare Display (UFD) Central Operations Suite for NHAI & IHMCL Highway Toll Plazas.">
+  
+  <!-- Modern Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Orbitron:wght@600;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/led-matrix.css">
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- TOP HEADER -->
+    <header class="top-header">
+      <div class="header-brand">
+        <div class="logo-badge">
+          <svg viewBox="0 0 24 24">
+            <path d="M4 6h16v2H4zm2 4h12v2H6zm-2 4h16v2H4zm4 4h8v2H8z"/>
+          </svg>
+        </div>
+        <div class="brand-info">
+          <h1>
+            <span id="header-plaza-name">NHAI Toll Plaza - Operations Center</span>
+            <span class="badge-nhai" id="header-plaza-code">NHAI-ATMS</span>
+          </h1>
+          <div class="brand-subtitle">Highway Canopy Gantry, Approach Road & Lane UFD Central Station</div>
+        </div>
+      </div>
+
+      <div class="header-status-bar">
+        <div class="status-pill" id="header-ws-status">
+          <span class="status-indicator"></span> System: Connecting...
+        </div>
+        <div class="status-pill">
+          <span style="color: var(--accent-cyan); font-weight: 600;">Active Hardware:</span>
+          <span id="header-hardware-count" style="color: var(--text-primary); font-family: var(--font-mono); font-weight: 600;">--</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button id="btn-connect-serial" class="btn btn-secondary" title="Connect directly to physical RS485 converter using Web Serial API">
+          🔌 RS485 COM
+        </button>
+        <button id="btn-emergency-broadcast" class="btn btn-emergency" title="Broadcast instant SOS / Hazard alert to all highway displays">
+          🚨 SOS Broadcast
+        </button>
+      </div>
+    </header>
+
+    <!-- NAVIGATION TABS -->
+    <nav class="nav-tabs">
+      <button class="tab-btn active" data-tab="tab-overview">
+        🚦 Plaza Overview & Gantry
+      </button>
+      <button class="tab-btn" data-tab="tab-matrix">
+        🖥️ LED Matrix Studio
+      </button>
+      <button class="tab-btn" data-tab="tab-lanes">
+        🛣️ Lane Control (LCS & UFD)
+      </button>
+      <button class="tab-btn" data-tab="tab-fleet">
+        📡 Hardware Fleet & IPs
+      </button>
+      <button class="tab-btn" data-tab="tab-packets">
+        🔍 Packet Inspector (Wireshark Log)
+      </button>
+    </nav>
+
+    <!-- MAIN VIEW AREA -->
+    <main class="main-content">
+
+      <!-- =========================================================================
+           TAB 1: PLAZA OVERVIEW & GANTRY
+           ========================================================================= -->
+      <section id="tab-overview" class="view-section active">
+        
+        <!-- Active Device Selector Strip -->
+        <div class="device-selector-bar">
+          <div class="selector-left">
+            <span class="selector-label">Target VMS Display:</span>
+            <select id="device-select-dropdown" class="device-dropdown">
+              <option value="canopy-01">Overhead Canopy Gantry VMS</option>
+            </select>
+          </div>
+
+          <div class="device-telemetry-strip">
+            <div class="telemetry-item">
+              <span>PROTOCOL:</span>
+              <span id="hud-proto-val" class="val" style="color: #fbbf24;">NHAI_ASCII</span>
+            </div>
+            <div class="telemetry-item">
+              <span>SOCKET:</span>
+              <span id="hud-ip-val" class="val" style="color: var(--accent-cyan);">192.168.1.100:5005</span>
+            </div>
+            <div class="telemetry-item">
+              <span>STATUS:</span>
+              <span id="hud-status-val" class="val" style="font-weight: 700;">STANDBY</span>
+            </div>
+            <div class="telemetry-item">
+              <span>PING:</span>
+              <span id="hud-ping-val" class="val" style="color: var(--accent-cyan);">--</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          
+          <!-- LEFT: Interactive LED Matrix Enclosure & Message Composer -->
+          <div class="main-panel">
+            
+            <!-- Outdoor Highway LED Display Enclosure -->
+            <div class="led-vms-enclosure">
+              <div class="led-enclosure-header">
+                <div class="vms-plate-badge">
+                  <span class="dot"></span>
+                  <span id="display-badge-title">OVERHEAD CANOPY GANTRY VMS - LIVE HARDWARE MIRROR</span>
+                </div>
+                <div style="font-family: var(--font-mono); font-size: 0.75rem; color: #7e8b9b;">
+                  P10 SMD / DIP OUTDOOR MATRIX
+                </div>
+              </div>
+
+              <!-- High-Fidelity Canvas Viewport -->
+              <div class="vms-display-viewport">
+                <canvas id="vms-canvas"></canvas>
+              </div>
+
+              <div class="vms-enclosure-footer">
+                <div>MODE: <span class="vms-mode-badge">DIRECT TCP/IP SOCKET</span></div>
+                <div class="vms-controls-strip">
+                  <span>REFRESH: <strong>60 FPS</strong></span>
+                  <span>ENCRYPTION: <strong>CRC/BCC VERIFIED</strong></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Message Composer Card -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                  </svg>
+                  Message Composer & Bilingual Formatter
+                </div>
+                <button id="btn-clear-screen" class="btn btn-secondary" style="font-size: 0.78rem; padding: 4px 10px;">
+                  🧹 Clear Board
+                </button>
+              </div>
+
+              <div class="composer-grid">
+                
+                <!-- Left: Text Inputs -->
+                <div>
+                  <div class="form-group">
+                    <label class="form-label" for="input-line1">Line 1 (English / Highway Text):</label>
+                    <input type="text" id="input-line1" class="form-input" value="FASTag LANE ONLY" placeholder="e.g. FASTag LANE ONLY / TOLL PLAZA 1 KM" autocomplete="off">
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="input-line2">Line 2 (Hindi / Bilingual / Instructions):</label>
+                    <input type="text" id="input-line2" class="form-input" value="कृपया लेन न बदलें" placeholder="e.g. कृपया लेन न बदलें" autocomplete="off">
+                    
+                    <!-- Quick Hindi Phrase Chips -->
+                    <div class="hindi-quick-chips" id="hindi-chips-container"></div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="input-line3">Line 3 (Optional / Sub-Advisory):</label>
+                    <input type="text" id="input-line3" class="form-input" placeholder="e.g. KEEP MIN DISTANCE 50M" autocomplete="off">
+                  </div>
+                </div>
+
+                <!-- Right: Visual Controls (Color, Effect, Speed, Brightness) -->
+                <div>
+                  <div class="form-group">
+                    <label class="form-label">LED Phosphor Color:</label>
+                    <div class="color-picker-row">
+                      <div class="color-option active" data-color="A">
+                        <span class="color-dot amber"></span> Amber
+                      </div>
+                      <div class="color-option" data-color="G">
+                        <span class="color-dot green"></span> Green
+                      </div>
+                      <div class="color-option" data-color="R">
+                        <span class="color-dot red"></span> Red
+                      </div>
+                      <div class="color-option" data-color="W">
+                        <span class="color-dot white"></span> White
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="input-effect">Display Motion & Effect:</label>
+                    <select id="input-effect" class="form-select">
+                      <option value="S">Static (Permanent Display)</option>
+                      <option value="L">Smooth Left Scroll (Ticker)</option>
+                      <option value="F">Flash / Blink (Urgent Alert)</option>
+                    </select>
+                  </div>
+
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                    <div class="form-group">
+                      <label class="form-label" for="input-speed">Scroll/Flash Speed:</label>
+                      <input type="range" id="input-speed" min="1" max="15" value="5" style="width: 100%; accent-color: var(--accent-cyan);">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label" for="input-brightness">Brightness (0-15):</label>
+                      <input type="range" id="input-brightness" min="0.1" max="1.0" step="0.1" value="1.0" style="width: 100%; accent-color: #fbbf24;">
+                    </div>
+                  </div>
+
+                  <div style="margin-top: 14px; display: flex; gap: 10px;">
+                    <button id="btn-send-message" class="btn btn-primary" style="flex: 1; justify-content: center; padding: 12px;">
+                      🚀 Transmit to Hardware
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+
+          <!-- RIGHT: Highway Operations & FASTag Presets -->
+          <div class="sidebar-panel">
+            <div class="card" style="height: 100%;">
+              <div class="card-header">
+                <div class="card-title">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                  </svg>
+                  Highway & Toll Presets
+                </div>
+              </div>
+              <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 12px;">
+                Click any standard advisory to instantly preview and dispatch to physical displays.
+              </p>
+              
+              <div class="preset-list" id="presets-list-container"></div>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =========================================================================
+           TAB 2: LED MATRIX STUDIO (FULL CANVAS EMULATOR)
+           ========================================================================= -->
+      <section id="tab-matrix" class="view-section">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              🖥️ Real-Time Matrix Pixel Diagnostics & Resolution Studio
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <button class="btn btn-secondary" onclick="window.app.ledCanvas.setDimensions(96, 32)">96 × 32 (UFD)</button>
+              <button class="btn btn-secondary" onclick="window.app.ledCanvas.setDimensions(160, 32)">160 × 32 (Approach)</button>
+              <button class="btn btn-secondary" onclick="window.app.ledCanvas.setDimensions(192, 32)">192 × 32 (Gantry)</button>
+              <button class="btn btn-secondary" onclick="window.app.ledCanvas.setDimensions(192, 64)">192 × 64 (High-Res)</button>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 10px;">
+            <div style="background: rgba(255,255,255,0.02); padding: 16px; border-radius: 8px; border: 1px solid var(--border-color);">
+              <h4 style="font-size: 0.9rem; margin-bottom: 8px; color: var(--accent-cyan);">Supported Hardware Cards</h4>
+              <ul style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.8; margin-left: 18px;">
+                <li>Onbon BX-5 / BX-6 / BX-6E (TCP & Serial)</li>
+                <li>Listen Vision TF-series & Colorlight</li>
+                <li>Huidu HD-WF & C-series</li>
+                <li>NTCIP 1203 MULTI highway controllers</li>
+                <li>NHAI / IHMCL Standard Toll TLC Displays</li>
+              </ul>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.02); padding: 16px; border-radius: 8px; border: 1px solid var(--border-color);">
+              <h4 style="font-size: 0.9rem; margin-bottom: 8px; color: #fbbf24;">Devanagari Unicode Engine</h4>
+              <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6;">
+                UTF-8 Unicode rasterization with pixel thresholding. Renders Hindi matras, conjuncts, and numerals crisply on outdoor LED matrices without glyph clipping.
+              </p>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.02); padding: 16px; border-radius: 8px; border: 1px solid var(--border-color);">
+              <h4 style="font-size: 0.9rem; margin-bottom: 8px; color: var(--led-green);">TLC & TMS Integration API</h4>
+              <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6;">
+                Toll Lane Computer (TLC) software can send real FASTag deduction webhooks to <code>/api/external/ufd-update</code> to dynamically update driver fare displays.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- =========================================================================
+           TAB 3: LANE CONTROL (LCS & UFD)
+           ========================================================================= -->
+      <section id="tab-lanes" class="view-section">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+          <div>
+            <h2 style="font-size: 1.2rem; font-weight: 700;">Toll Plaza Lane Operations & UFD Display Fleet</h2>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">Synchronized control for Overhead Lane Control Signs (LCS Green Arrow / Red Cross) and Driver User Fare Displays (UFD).</p>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <button class="btn btn-primary" onclick="window.app.deviceManager.openAddModal('LANE_UFD')">
+              ➕ Add New Lane
+            </button>
+          </div>
+        </div>
+
+        <div class="lanes-grid" id="lanes-cards-container">
+          <!-- Populated dynamically by deviceManager.js -->
+        </div>
+      </section>
+
+
+      <!-- =========================================================================
+           TAB 4: HARDWARE FLEET & IPS
+           ========================================================================= -->
+      <section id="tab-fleet" class="view-section">
+        
+        <!-- LAN Subnet Scanner Card -->
+        <div class="card" style="margin-bottom: 24px; border: 1px solid var(--border-glow);">
+          <div class="card-header">
+            <div class="card-title">
+              🔍 LAN Subnet Auto-Discovery Scanner
+            </div>
+          </div>
+          <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 12px;">
+            Scan your plaza network switch to automatically detect active VMS display IP addresses.
+          </p>
+          <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 0.8rem; color: var(--text-muted);">Subnet:</span>
+              <input type="text" id="scan-subnet" class="form-input" value="192.168.1" style="width: 120px; padding: 6px 10px;">
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 0.8rem; color: var(--text-muted);">From IP:</span>
+              <input type="number" id="scan-start" class="form-input" value="100" style="width: 75px; padding: 6px 10px;">
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 0.8rem; color: var(--text-muted);">To IP:</span>
+              <input type="number" id="scan-end" class="form-input" value="130" style="width: 75px; padding: 6px 10px;">
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 0.8rem; color: var(--text-muted);">Port:</span>
+              <input type="number" id="scan-port" class="form-input" value="5005" style="width: 85px; padding: 6px 10px;">
+            </div>
+            <button id="btn-run-scan" class="btn btn-primary" onclick="window.app.runSubnetScan()">
+              🔍 Scan Subnet
+            </button>
+          </div>
+          <div id="scan-results-container"></div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+          <div>
+            <h2 style="font-size: 1.2rem; font-weight: 700;">Configured VMS Hardware Fleet</h2>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">Manage assigned IP addresses, TCP ports, communication protocols, and socket tests.</p>
+          </div>
+          <button class="btn btn-primary" onclick="window.app.deviceManager.openAddModal('GANTRY')">
+            ➕ Add VMS Hardware
+          </button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 20px;" id="fleet-devices-grid">
+          <!-- Populated by deviceManager.js -->
+        </div>
+      </section>
+
+
+      <!-- =========================================================================
+           TAB 5: PACKET INSPECTOR (WIRESHARK-STYLE LOG)
+           ========================================================================= -->
+      <section id="tab-packets" class="view-section">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              🔍 Live Network Packet Inspector (Hex & ASCII Frame Stream)
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 6px 12px;" onclick="window.app.packetMonitor.setFilter('ALL')">All</button>
+              <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 6px 12px;" onclick="window.app.packetMonitor.setFilter('TX')">TX (Transmit)</button>
+              <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 6px 12px;" onclick="window.app.packetMonitor.setFilter('RX')">RX (Receive)</button>
+              <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 6px 12px;" onclick="window.app.packetMonitor.clear()">Clear</button>
+              <button class="btn btn-primary" style="font-size: 0.75rem; padding: 6px 12px;" onclick="window.app.packetMonitor.exportLogs()">📥 Export JSON</button>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 85px 50px 110px 120px 1fr; gap: 10px; padding: 8px 10px; background: rgba(0,0,0,0.4); border-bottom: 1px solid var(--border-color); font-size: 0.75rem; font-weight: 700; color: var(--text-muted);">
+            <div>TIME</div>
+            <div>DIR</div>
+            <div>PROTOCOL</div>
+            <div>TARGET</div>
+            <div>RAW HEX BYTES & ASCII DECODED PAYLOAD</div>
+          </div>
+
+          <div class="packet-log-container" id="packet-log-container">
+            <!-- Populated in real-time by packetMonitor.js -->
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- MODAL: ADD / EDIT VMS DEVICE -->
+  <div id="modal-add-device" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 999; align-items: center; justify-content: center;">
+    <div class="card" style="width: 500px; max-width: 90vw;">
+      <div class="card-header">
+        <div class="card-title" id="modal-device-title">Add Physical VMS Hardware</div>
+        <button onclick="document.getElementById('modal-add-device').style.display='none'" style="background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer;">✕</button>
+      </div>
+
+      <form id="form-add-device" onsubmit="event.preventDefault(); window.saveDeviceModalSubmit();">
+        <input type="hidden" id="edit-dev-id">
+
+        <div class="form-group">
+          <label class="form-label" for="new-dev-name">Display Name:</label>
+          <input type="text" id="new-dev-name" class="form-input" required placeholder="e.g. Approach VMS South 500M / Lane 05 UFD">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label class="form-label" for="new-dev-ip">IP Address:</label>
+            <input type="text" id="new-dev-ip" class="form-input" required placeholder="192.168.1.120">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="new-dev-port">TCP Port:</label>
+            <input type="number" id="new-dev-port" class="form-input" required value="5005">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="new-dev-proto">Communication Protocol:</label>
+          <select id="new-dev-proto" class="form-select">
+            <option value="NHAI_ASCII">NHAI / IHMCL Toll ASCII Protocol (Standard)</option>
+            <option value="ONBON_BX">Onbon BX Series (BX-5 / BX-6 / BX-6E)</option>
+            <option value="NTCIP_1203">NTCIP 1203 MULTI Format (ITS Highway Standard)</option>
+            <option value="MODBUS_TCP">Modbus TCP (Industrial Matrix Displays)</option>
+            <option value="RAW_STREAM">Raw Stream / Serial-to-Ethernet Converter (Moxa/USR)</option>
+          </select>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label class="form-label" for="new-dev-type">Device Type:</label>
+            <select id="new-dev-type" class="form-select">
+              <option value="GANTRY">Overhead Canopy Gantry VMS</option>
+              <option value="APPROACH">Highway Approach VMS (500M/1KM)</option>
+              <option value="LANE_UFD">Lane User Fare Display (UFD) & LCS</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="new-dev-lane">Lane Number (if Lane UFD):</label>
+            <input type="number" id="new-dev-lane" class="form-input" placeholder="e.g. 5">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="new-dev-matrix">Pixel Resolution (Width × Height):</label>
+          <select id="new-dev-matrix" class="form-select">
+            <option value="192x32">192 × 32 (Standard Gantry)</option>
+            <option value="160x32">160 × 32 (Highway Approach)</option>
+            <option value="128x32">128 × 32 (Medium)</option>
+            <option value="96x32">96 × 32 (Lane UFD)</option>
+            <option value="192x64">192 × 64 (High Resolution)</option>
+            <option value="256x64">256 × 64 (Dual Line Highway)</option>
+          </select>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 18px;">
+          <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="document.getElementById('modal-add-device').style.display='none'">Cancel</button>
+          <button type="submit" class="btn btn-primary" style="flex: 1;">Save & Synchronize</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="js/ledCanvas.js"></script>
+  <script src="js/presets.js"></script>
+  <script src="js/packetMonitor.js"></script>
+  <script src="js/deviceManager.js"></script>
+  <script src="js/app.js"></script>
+
+  <script>
+    window.saveDeviceModalSubmit = function() {
+      const editId = document.getElementById('edit-dev-id').value;
+      const name = document.getElementById('new-dev-name').value;
+      const ip = document.getElementById('new-dev-ip').value;
+      const port = parseInt(document.getElementById('new-dev-port').value, 10);
+      const protocol = document.getElementById('new-dev-proto').value;
+      const type = document.getElementById('new-dev-type').value;
+      const laneNumber = document.getElementById('new-dev-lane').value ? parseInt(document.getElementById('new-dev-lane').value, 10) : null;
+      const matrixVal = document.getElementById('new-dev-matrix').value.split('x');
+      const matrixWidth = parseInt(matrixVal[0], 10);
+      const matrixHeight = parseInt(matrixVal[1], 10);
+
+      const deviceData = {
+        name,
+        ip,
+        port,
+        protocol,
+        type,
+        laneNumber,
+        matrixWidth,
+        matrixHeight,
+        status: 'standby'
+      };
+
+      if (editId) {
+        deviceData.id = editId;
+      }
+
+      window.app.deviceManager.saveDevice(deviceData).then(() => {
+        document.getElementById('modal-add-device').style.display = 'none';
+        document.getElementById('form-add-device').reset();
+      });
+    };
+  </script>
+</body>
+</html>

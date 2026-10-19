@@ -1,0 +1,172 @@
+/* =========================================================================
+   LED MATRIX SIGN BOARD ENCLOSURE & SIMULATOR STYLING
+   ========================================================================= */
+
+.led-vms-enclosure {
+  background: linear-gradient(180deg, #1f2530 0%, #11141c 100%);
+  border: 4px solid #2b3345;
+  border-radius: 12px;
+  padding: 16px;
+  position: relative;
+  box-shadow: 
+    0 20px 50px rgba(0, 0, 0, 0.8),
+    inset 0 2px 4px rgba(255, 255, 255, 0.1),
+    inset 0 -2px 6px rgba(0, 0, 0, 0.7);
+  margin-bottom: 20px;
+}
+
+/* Metal hood / visor over sign */
+.led-vms-enclosure::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: 20px;
+  right: 20px;
+  height: 6px;
+  background: #3b455b;
+  border-radius: 4px 4px 0 0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.led-enclosure-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.vms-plate-badge {
+  font-family: var(--font-digital);
+  font-size: 0.75rem;
+  letter-spacing: 1.5px;
+  color: #7e8b9b;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vms-plate-badge .dot {
+  width: 6px;
+  height: 6px;
+  background: var(--accent-cyan);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--accent-cyan);
+}
+
+.vms-display-viewport {
+  background: #020305;
+  border: 2px solid #0d121c;
+  border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.95);
+  min-height: 160px;
+}
+
+/* Scanline and anti-glare mesh overlay */
+.vms-display-viewport::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse at 50% 20%, rgba(255, 255, 255, 0.03) 0%, transparent 60%),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.3) 0px, rgba(0, 0, 0, 0.3) 2px, transparent 2px, transparent 4px);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* The actual HTML5 Canvas representing each physical LED pixel */
+#vms-canvas {
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+/* Fallback / CSS LED Matrix renderer when canvas is loading */
+.css-led-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  text-align: center;
+  z-index: 1;
+}
+
+.css-led-line {
+  font-family: 'Orbitron', 'Inter', monospace;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.css-led-line.amber {
+  color: var(--led-amber);
+  text-shadow: 
+    0 0 2px var(--led-amber),
+    0 0 10px var(--led-amber-glow),
+    0 0 20px rgba(255, 170, 0, 0.3);
+}
+
+.css-led-line.green {
+  color: var(--led-green);
+  text-shadow: 
+    0 0 2px var(--led-green),
+    0 0 10px var(--led-green-glow),
+    0 0 20px rgba(0, 230, 118, 0.3);
+}
+
+.css-led-line.red {
+  color: var(--led-red);
+  text-shadow: 
+    0 0 2px var(--led-red),
+    0 0 10px var(--led-red-glow),
+    0 0 20px rgba(255, 51, 75, 0.3);
+}
+
+.css-led-line.white {
+  color: var(--led-white);
+  text-shadow: 
+    0 0 2px var(--led-white),
+    0 0 10px var(--led-white-glow),
+    0 0 20px rgba(224, 242, 254, 0.4);
+}
+
+/* VMS Enclosure Bottom Status Bar */
+.vms-enclosure-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.vms-controls-strip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.vms-mode-badge {
+  padding: 3px 8px;
+  background: rgba(0, 229, 255, 0.1);
+  border: 1px solid rgba(0, 229, 255, 0.3);
+  color: var(--accent-cyan);
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}

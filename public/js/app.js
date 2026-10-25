@@ -19,7 +19,7 @@ class TollVMSApp {
     this.serialWriter = null;
 
     this.activeTab = 'tab-overview';
-    this.selectedColor = 'A';
+    this.selectedColor = 'R';
     this.selectedEffect = 'S';
   }
 
@@ -37,11 +37,11 @@ class TollVMSApp {
     if (canvasElem) {
       this.ledCanvas = new LEDMatrixCanvas(canvasElem, {
         matrixWidth: 192,
-        matrixHeight: 32,
+        matrixHeight: 64,
         dotPitch: 4,
         dotRadius: 1.5,
-        lines: ['FASTag LANE ONLY', 'कृपया लेन न बदलें'],
-        color: 'A',
+        lines: ["Don't Drink and Drive", 'शराब पी कर गाड़ी ना चलाएं'],
+        color: 'R',
         effect: 'S',
         speed: 5,
         brightness: 1.0
@@ -293,10 +293,12 @@ class TollVMSApp {
 
     const l1 = document.getElementById('input-line1');
     const l2 = document.getElementById('input-line2');
+    const l3 = document.getElementById('input-line3');
     if (l1) l1.value = preset.line1 || '';
     if (l2) l2.value = preset.line2 || '';
+    if (l3) l3.value = preset.line3 || '';
 
-    this.selectedColor = preset.color || 'A';
+    this.selectedColor = preset.color || 'R';
     this.selectedEffect = preset.effect || 'S';
 
     document.querySelectorAll('.color-option').forEach(b => {
@@ -311,7 +313,7 @@ class TollVMSApp {
 
     if (this.ledCanvas) {
       this.ledCanvas.updateContent({
-        lines: [preset.line1, preset.line2].filter(Boolean),
+        lines: [preset.line1, preset.line2, preset.line3].filter(Boolean),
         color: this.selectedColor,
         effect: this.selectedEffect,
         speed: preset.speed || 5

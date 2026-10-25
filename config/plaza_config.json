@@ -2,10 +2,10 @@
   "plazaInfo": {
     "plazaName": "Tecsidel Toll Operations Center",
     "plazaCode": "TECSIDEL-NHAI-01",
-    "highwayName": "Tecsidel Intelligent Transportation Systems (ITS)",
+    "highwayName": "National Highways Authority of India (NHAI)",
     "operator": "Tecsidel Toll Automation & ATMS Division",
     "healthCheckIntervalSec": 20,
-    "enableVirtualEcho": true
+    "enableVirtualEcho": false
   },
   "devices": [
     {
@@ -23,159 +23,9 @@
       "lastSeen": null,
       "currentMessage": {
         "line1": "Don't Drink and Drive",
-        "line2": "TECSIDEL NHAI TOLL",
+        "line2": "शराब पी कर गाड़ी ना चलाएं",
+        "line3": "आपकी यात्रा मंगलमय हो...",
         "color": "R",
-        "effect": "S",
-        "speed": "05"
-      }
-    },
-    {
-      "id": "tecsidel-live-01",
-      "name": "Tecsidel Interactive Sign (Live Gateway)",
-      "type": "GANTRY",
-      "laneNumber": null,
-      "ip": "127.0.0.1",
-      "port": 5005,
-      "protocol": "NHAI_ASCII",
-      "address": "01",
-      "matrixWidth": 192,
-      "matrixHeight": 32,
-      "status": "connected",
-      "lastSeen": null,
-      "currentMessage": {
-        "line1": "TECSIDEL TOLL SYSTEMS",
-        "line2": "FASTag LANE OPEN - ₹85",
-        "color": "G",
-        "effect": "S",
-        "speed": "05"
-      }
-    },
-    {
-      "id": "canopy-01",
-      "name": "Overhead Canopy Gantry VMS",
-      "type": "GANTRY",
-      "laneNumber": null,
-      "ip": "192.168.1.100",
-      "port": 5005,
-      "protocol": "NHAI_ASCII",
-      "address": "01",
-      "matrixWidth": 192,
-      "matrixHeight": 32,
-      "status": "offline",
-      "lastSeen": null,
-      "currentMessage": {
-        "line1": "FASTag LANE ONLY",
-        "line2": "कृपया लेन न बदलें",
-        "color": "A",
-        "effect": "S",
-        "speed": "05"
-      }
-    },
-    {
-      "id": "approach-01",
-      "name": "Highway Approach 1KM VMS",
-      "type": "APPROACH",
-      "laneNumber": null,
-      "ip": "192.168.1.101",
-      "port": 5005,
-      "protocol": "NTCIP_1203",
-      "address": "02",
-      "matrixWidth": 160,
-      "matrixHeight": 32,
-      "status": "offline",
-      "lastSeen": null,
-      "currentMessage": {
-        "line1": "TOLL PLAZA 1 KM AHEAD",
-        "line2": "SPEED LIMIT 30 KM/H",
-        "color": "A",
-        "effect": "S",
-        "speed": "05"
-      }
-    },
-    {
-      "id": "lane-01",
-      "name": "ttttttt",
-      "type": "APPROACH",
-      "laneNumber": 1,
-      "ip": "192.168.1.111",
-      "port": 5005,
-      "protocol": "NHAI_ASCII",
-      "address": "11",
-      "matrixWidth": 96,
-      "matrixHeight": 32,
-      "laneSignal": "G",
-      "status": "offline",
-      "lastSeen": null,
-      "currentMessage": {
-        "line1": "",
-        "line2": "",
-        "line3": "",
-        "color": "A",
-        "effect": "S",
-        "speed": "05"
-      }
-    },
-    {
-      "id": "lane-02",
-      "name": "okh",
-      "type": "LANE_UFD",
-      "laneNumber": 2,
-      "ip": "192.168.1.112",
-      "port": 5005,
-      "protocol": "NHAI_ASCII",
-      "address": "12",
-      "matrixWidth": 96,
-      "matrixHeight": 32,
-      "laneSignal": "G",
-      "status": "standby",
-      "lastSeen": null,
-      "currentMessage": {
-        "line1": "FASTag VALID",
-        "line2": "PROCEED TO LANE",
-        "color": "G",
-        "effect": "S",
-        "speed": "05"
-      }
-    },
-    {
-      "id": "lane-03",
-      "name": "Lane 03 - Cash / ETC Hybrid & LCS",
-      "type": "LANE_UFD",
-      "laneNumber": 3,
-      "ip": "192.168.1.113",
-      "protocol": "NHAI_ASCII",
-      "address": "13",
-      "matrixWidth": 96,
-      "matrixHeight": 32,
-      "laneSignal": "G",
-      "status": "standby",
-      "lastSeen": null,
-      "currentMessage": {
-        "line1": "CASH & FASTAG",
-        "line2": "STOP - PAY TOLL",
-        "color": "A",
-        "effect": "S",
-        "speed": "05"
-      }
-    },
-    {
-      "id": "lane-04",
-      "name": "Lane 04 - FASTag UFD & LCS",
-      "type": "LANE_UFD",
-      "laneNumber": 4,
-      "ip": "192.168.1.114",
-      "port": 5005,
-      "protocol": "NHAI_ASCII",
-      "address": "14",
-      "matrixWidth": 96,
-      "matrixHeight": 32,
-      "laneSignal": "G",
-      "status": "offline",
-      "lastSeen": null,
-      "currentMessage": {
-        "line1": "FASTag VALID",
-        "line2": "PROCEED TO LANE",
-        "color": "G",
         "effect": "S",
         "speed": "05"
       }

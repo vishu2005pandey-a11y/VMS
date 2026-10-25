@@ -93,26 +93,26 @@
           <div class="selector-left">
             <span class="selector-label">Target VMS Display:</span>
             <select id="device-select-dropdown" class="device-dropdown">
-              <option value="canopy-01">Overhead Canopy Gantry VMS</option>
+              <option value="boxplayer-huidu-a3">🟢 BoxPlayer - Huidu HD-A3 VMS [192.168.83.115:10001]</option>
             </select>
           </div>
 
           <div class="device-telemetry-strip">
             <div class="telemetry-item">
               <span>PROTOCOL:</span>
-              <span id="hud-proto-val" class="val" style="color: #fbbf24;">NHAI_ASCII</span>
+              <span id="hud-proto-val" class="val" style="color: #fbbf24;">HUIDU_A3</span>
             </div>
             <div class="telemetry-item">
               <span>SOCKET:</span>
-              <span id="hud-ip-val" class="val" style="color: var(--accent-cyan);">192.168.1.100:5005</span>
+              <span id="hud-ip-val" class="val" style="color: var(--accent-cyan);">192.168.83.115:10001</span>
             </div>
             <div class="telemetry-item">
               <span>STATUS:</span>
-              <span id="hud-status-val" class="val" style="font-weight: 700;">STANDBY</span>
+              <span id="hud-status-val" class="val" style="font-weight: 700; color: var(--led-green);">ONLINE</span>
             </div>
             <div class="telemetry-item">
               <span>PING:</span>
-              <span id="hud-ping-val" class="val" style="color: var(--accent-cyan);">--</span>
+              <span id="hud-ping-val" class="val" style="color: var(--accent-cyan);">&lt; 10ms</span>
             </div>
           </div>
         </div>
@@ -127,7 +127,7 @@
               <div class="led-enclosure-header">
                 <div class="vms-plate-badge">
                   <span class="dot"></span>
-                  <span id="display-badge-title">OVERHEAD CANOPY GANTRY VMS - LIVE HARDWARE MIRROR</span>
+                  <span id="display-badge-title">BOXPLAYER (HUIDU HD-A3) - LIVE HARDWARE MIRROR</span>
                 </div>
                 <div style="font-family: var(--font-mono); font-size: 0.75rem; color: #7e8b9b;">
                   P10 SMD / DIP OUTDOOR MATRIX
@@ -140,10 +140,10 @@
               </div>
 
               <div class="vms-enclosure-footer">
-                <div>MODE: <span class="vms-mode-badge">DIRECT TCP/IP SOCKET</span></div>
+                <div>DRIVER: <span class="vms-mode-badge" style="color: var(--accent-cyan); border-color: var(--accent-cyan);">HUIDU SDK 2.0 (PORT 10001)</span></div>
                 <div class="vms-controls-strip">
                   <span>REFRESH: <strong>60 FPS</strong></span>
-                  <span>ENCRYPTION: <strong>CRC/BCC VERIFIED</strong></span>
+                  <span>ENCRYPTION: <strong>TCP CRC VERIFIED</strong></span>
                 </div>
               </div>
             </div>
@@ -155,7 +155,7 @@
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
                   </svg>
-                  Message Composer & Bilingual Formatter
+                  NHAI 2025 Message Composer & Bilingual Formatter
                 </div>
                 <button id="btn-clear-screen" class="btn btn-secondary" style="font-size: 0.78rem; padding: 4px 10px;">
                   🧹 Clear Board
@@ -168,20 +168,20 @@
                 <div>
                   <div class="form-group">
                     <label class="form-label" for="input-line1">Line 1 (English / Highway Text):</label>
-                    <input type="text" id="input-line1" class="form-input" value="FASTag LANE ONLY" placeholder="e.g. FASTag LANE ONLY / TOLL PLAZA 1 KM" autocomplete="off">
+                    <input type="text" id="input-line1" class="form-input" value="Don't Drink and Drive" placeholder="e.g. Don't Drink and Drive" autocomplete="off">
                   </div>
 
                   <div class="form-group">
-                    <label class="form-label" for="input-line2">Line 2 (Hindi / Bilingual / Instructions):</label>
-                    <input type="text" id="input-line2" class="form-input" value="कृपया लेन न बदलें" placeholder="e.g. कृपया लेन न बदलें" autocomplete="off">
+                    <label class="form-label" for="input-line2">Line 2 (Hindi / NHAI 2025 Circular):</label>
+                    <input type="text" id="input-line2" class="form-input" value="शराब पी कर गाड़ी ना चलाएं" placeholder="e.g. शराब पी कर गाड़ी ना चलाएं" autocomplete="off">
                     
                     <!-- Quick Hindi Phrase Chips -->
                     <div class="hindi-quick-chips" id="hindi-chips-container"></div>
                   </div>
 
                   <div class="form-group">
-                    <label class="form-label" for="input-line3">Line 3 (Optional / Sub-Advisory):</label>
-                    <input type="text" id="input-line3" class="form-input" placeholder="e.g. KEEP MIN DISTANCE 50M" autocomplete="off">
+                    <label class="form-label" for="input-line3">Line 3 (Sub-Advisory / Tagline):</label>
+                    <input type="text" id="input-line3" class="form-input" value="आपकी यात्रा मंगलमय हो..." placeholder="e.g. आपकी यात्रा मंगलमय हो..." autocomplete="off">
                   </div>
                 </div>
 
@@ -190,13 +190,13 @@
                   <div class="form-group">
                     <label class="form-label">LED Phosphor Color:</label>
                     <div class="color-picker-row">
-                      <div class="color-option active" data-color="A">
+                      <div class="color-option" data-color="A">
                         <span class="color-dot amber"></span> Amber
                       </div>
                       <div class="color-option" data-color="G">
                         <span class="color-dot green"></span> Green
                       </div>
-                      <div class="color-option" data-color="R">
+                      <div class="color-option active" data-color="R">
                         <span class="color-dot red"></span> Red
                       </div>
                       <div class="color-option" data-color="W">

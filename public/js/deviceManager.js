@@ -8,7 +8,7 @@ class DeviceManager {
   constructor(app) {
     this.app = app;
     this.devices = [];
-    this.selectedDeviceId = 'canopy-01';
+    this.selectedDeviceId = 'boxplayer-huidu-a3';
   }
 
   setDevices(devices) {

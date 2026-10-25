@@ -6,8 +6,10 @@ const nhaiAscii = require('./nhaiAscii');
 const onbonBx = require('./onbonBx');
 const ntcip1203 = require('./ntcip1203');
 const { modbusTcp, rawStream } = require('./modbusTcp');
+const huiduA3 = require('./huiduA3');
 
 const PROTOCOLS = {
+  HUIDU_A3: 'HUIDU_A3',
   NHAI_ASCII: 'NHAI_ASCII',
   ONBON_BX: 'ONBON_BX',
   NTCIP_1203: 'NTCIP_1203',
@@ -19,6 +21,12 @@ function encodeMessage(protocol, options) {
   const proto = (protocol || 'NHAI_ASCII').toUpperCase();
 
   switch (proto) {
+    case 'HUIDU_A3':
+    case 'HUIDU':
+    case 'HD_A3':
+    case 'BOXPLAYER':
+      return { protocol: 'HUIDU_A3', ...huiduA3.encode(options) };
+
     case 'ONBON_BX':
     case 'ONBON':
     case 'BX':
@@ -47,6 +55,11 @@ function decodeMessage(protocol, buffer) {
   const proto = (protocol || 'NHAI_ASCII').toUpperCase();
 
   switch (proto) {
+    case 'HUIDU_A3':
+    case 'HUIDU':
+    case 'HD_A3':
+    case 'BOXPLAYER':
+      return huiduA3.decode(buffer);
     case 'ONBON_BX':
       return onbonBx.decode(buffer);
     case 'NTCIP_1203':
@@ -65,6 +78,7 @@ module.exports = {
   PROTOCOLS,
   encodeMessage,
   decodeMessage,
+  huiduA3,
   nhaiAscii,
   onbonBx,
   ntcip1203,

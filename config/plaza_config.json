@@ -9,6 +9,27 @@
   },
   "devices": [
     {
+      "id": "boxplayer-huidu-a3",
+      "name": "BoxPlayer - Huidu HD-A3 VMS",
+      "type": "GANTRY",
+      "laneNumber": null,
+      "ip": "192.168.83.115",
+      "port": 10001,
+      "protocol": "HUIDU_A3",
+      "address": "01",
+      "matrixWidth": 192,
+      "matrixHeight": 64,
+      "status": "connected",
+      "lastSeen": null,
+      "currentMessage": {
+        "line1": "Don't Drink and Drive",
+        "line2": "TECSIDEL NHAI TOLL",
+        "color": "R",
+        "effect": "S",
+        "speed": "05"
+      }
+    },
+    {
       "id": "tecsidel-live-01",
       "name": "Tecsidel Interactive Sign (Live Gateway)",
       "type": "GANTRY",

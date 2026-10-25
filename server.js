@@ -163,15 +163,33 @@ app.delete('/api/devices/:id', (req, res) => {
 // Test connection / Ping IP:Port with real TCP socket probe
 app.post('/api/test-connection', async (req, res) => {
   const { ip, port = 5005, protocol = 'NHAI_ASCII' } = req.body;
+  const proto = (protocol || 'NHAI_ASCII').toUpperCase();
 
   try {
-    const encoded = protocols.encodeMessage(protocol, { command: 'S', address: '01', text: 'PING' });
-    logPacket('TX', 'PROBE', protocol, encoded.hexString, encoded.asciiString, `Probing ${ip}:${port}`);
+    if (proto === 'HUIDU_A3' || proto === 'HUIDU' || proto === 'HD_A3' || proto === 'BOXPLAYER') {
+      logPacket('TX', 'PROBE', proto, '0800012005000001', 'Huidu Transport Version Ask (0x2001)', `Probing Huidu HD-A3 controller [${ip}:${port || 10001}]`);
+      const probeResult = await protocols.huiduA3.probeHuidu(ip, Number(port || 10001), 2500);
+      if (probeResult.open) {
+        logPacket('RX', 'PROBE', proto, '08000220', 'CmdServiceAnswer (0x2002)', `Huidu Handshake OK (${probeResult.latency}ms)`);
+        return res.json({
+          success: true,
+          reachable: true,
+          latency: probeResult.latency,
+          rawHex: '08000220',
+          decoded: { protocol: 'HUIDU_A3', text: 'Huidu HD-A3 / BoxPlayer Controller Verified' }
+        });
+      } else {
+        throw new Error(probeResult.error || 'Connection timed out');
+      }
+    }
+
+    const encoded = protocols.encodeMessage(proto, { command: 'S', address: '01', text: 'PING' });
+    logPacket('TX', 'PROBE', proto, encoded.hexString, encoded.asciiString, `Probing ${ip}:${port}`);
 
     const result = await sendTcpPacket(ip, Number(port), encoded.rawBuffer, 2000);
-    const decoded = protocols.decodeMessage(protocol, result.response);
+    const decoded = protocols.decodeMessage(proto, result.response);
 
-    logPacket('RX', 'PROBE', protocol, decoded.rawHex || result.response.toString('hex').toUpperCase(), decoded.text || result.response.toString('utf-8'), `Probe Response (${result.latency}ms)`);
+    logPacket('RX', 'PROBE', proto, decoded.rawHex || result.response.toString('hex').toUpperCase(), decoded.text || result.response.toString('utf-8'), `Probe Response (${result.latency}ms)`);
 
     res.json({
       success: true,
@@ -181,7 +199,7 @@ app.post('/api/test-connection', async (req, res) => {
       decoded
     });
   } catch (err) {
-    logPacket('ERR', 'PROBE', protocol, '', '', `Probe failed to ${ip}:${port}: ${err.message}`);
+    logPacket('ERR', 'PROBE', proto, '', '', `Probe failed to ${ip}:${port}: ${err.message}`);
     res.json({
       success: false,
       reachable: false,
@@ -310,8 +328,35 @@ app.post('/api/send', async (req, res) => {
     if (command === 'L') device.laneSignal = laneSignal;
 
     try {
-      const tcpResult = await sendTcpPacket(device.ip, device.port, encoded.rawBuffer, 2500);
-      const decoded = protocols.decodeMessage(proto, tcpResult.response);
+      let tcpResult;
+      let decoded;
+
+      if (proto === 'HUIDU_A3' || proto === 'HUIDU' || proto === 'HD_A3' || proto === 'BOXPLAYER') {
+        // High-level Huidu 3-phase binary handshake and XML program upload on TCP port 10001
+        const huiduResult = await protocols.huiduA3.transmitToHuidu(device.ip, Number(device.port || 10001), {
+          text: combinedText,
+          lines: [line1, line2, line3].filter(Boolean),
+          color,
+          effect,
+          speed,
+          width: device.matrixWidth || 192,
+          height: device.matrixHeight || 64
+        }, 5000);
+
+        tcpResult = {
+          latency: huiduResult.latency,
+          response: Buffer.from(huiduResult.responseXml || 'kSuccess')
+        };
+        decoded = {
+          valid: true,
+          protocol: 'HUIDU_A3',
+          rawHex: '08000220...0x2004',
+          text: huiduResult.message || 'Huidu HD-A3 Screen Updated'
+        };
+      } else {
+        tcpResult = await sendTcpPacket(device.ip, device.port, encoded.rawBuffer, 2500);
+        decoded = protocols.decodeMessage(proto, tcpResult.response);
+      }
 
       configManager.updateDeviceStatus(device.id, 'connected', { pingMs: tcpResult.latency });
 
@@ -426,8 +471,18 @@ function startHealthMonitor() {
     const devices = configManager.getDevices();
     for (const dev of devices) {
       try {
-        const probeResult = await probeSocket(dev.ip, dev.port, 1500);
-        const newStatus = probeResult.open ? 'connected' : 'offline';
+        let isOpen = false;
+        const devProto = (dev.protocol || 'NHAI_ASCII').toUpperCase();
+
+        if (devProto === 'HUIDU_A3' || devProto === 'HUIDU' || devProto === 'HD_A3' || devProto === 'BOXPLAYER') {
+          const probeResult = await protocols.huiduA3.probeHuidu(dev.ip, Number(dev.port || 10001), 1500);
+          isOpen = probeResult.open;
+        } else {
+          const probeResult = await probeSocket(dev.ip, dev.port, 1500);
+          isOpen = probeResult.open;
+        }
+
+        const newStatus = isOpen ? 'connected' : 'offline';
         if (dev.status !== newStatus) {
           configManager.updateDeviceStatus(dev.id, newStatus);
           broadcastWs({ type: 'DEVICES_UPDATED', devices: configManager.getDevices() });

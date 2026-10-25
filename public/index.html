@@ -451,6 +451,7 @@
         <div class="form-group">
           <label class="form-label" for="new-dev-proto">Communication Protocol:</label>
           <select id="new-dev-proto" class="form-select">
+            <option value="HUIDU_A3" selected>Huidu HD-A3 / BoxPlayer (HDPlayer Binary Port 10001)</option>
             <option value="NHAI_ASCII">Tecsidel / NHAI Standard ASCII Protocol (STX-ETX)</option>
             <option value="ONBON_BX">Onbon BX Series (BX-5 / BX-6 / BX-6E)</option>
             <option value="NTCIP_1203">NTCIP 1203 MULTI Format (ITS Highway Standard)</option>
@@ -535,6 +536,20 @@
         document.getElementById('form-add-device').reset();
       });
     };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const protoSelect = document.getElementById('new-dev-proto');
+      const portInput = document.getElementById('new-dev-port');
+      if (protoSelect && portInput) {
+        protoSelect.addEventListener('change', (e) => {
+          if (e.target.value === 'HUIDU_A3') {
+            portInput.value = 10001;
+          } else if (portInput.value === '10001') {
+            portInput.value = 5005;
+          }
+        });
+      }
+    });
   </script>
 </body>
 </html>

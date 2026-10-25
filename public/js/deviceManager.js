@@ -102,7 +102,8 @@ class DeviceManager {
     document.getElementById('edit-dev-id').value = '';
     document.getElementById('modal-device-title').textContent = 'Add Physical VMS Hardware';
     document.getElementById('new-dev-type').value = defaultType;
-    document.getElementById('new-dev-port').value = 5005;
+    document.getElementById('new-dev-proto').value = 'HUIDU_A3';
+    document.getElementById('new-dev-port').value = 10001;
 
     if (defaultType === 'LANE_UFD') {
       const existingLanes = this.devices.filter(d => d.type === 'LANE_UFD' && d.laneNumber).map(d => Number(d.laneNumber));
